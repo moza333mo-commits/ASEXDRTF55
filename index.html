@@ -1,31 +1,160 @@
 <!DOCTYPE html>
-<html dir="rtl">
+<html dir="rtl" lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <title>لوحة التحكم | الرصيد المباشر</title>
-  <style>
-    body { margin: 0; background: #0f172a; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
-    .card { background: #1e293b; padding: 40px; border-radius: 20px; text-align: center; border: 1px solid #334155; width: 350px; }
-    .balance { font-size: 3.5rem; color: #10b981; margin: 20px 0; font-weight: bold; }
-    .time { color: #64748b; font-size: 0.9rem; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أرجوان الشام | Argwan AlSham</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37; /* لون ذهبي يشبه اللوغو */
+            --dark-bg: #0a0a0b;
+        }
+        body {
+            margin: 0; padding: 0;
+            background: var(--dark-bg);
+            font-family: 'Cairo', sans-serif;
+            color: white;
+            overflow-x: hidden;
+            background: linear-gradient(45deg, #0a0a0b 0%, #1a1a1d 100%);
+            min-height: 100vh;
+        }
+        /* خلفية متحركة خفيفة */
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 80%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1000px; margin: 0 auto; padding: 20px; text-align: center;
+        }
+
+        /* تنسيق اللوغو والترحيب */
+        .header-section {
+            margin-top: 40px; animation: fadeInDown 1s ease;
+        }
+        .logo {
+            width: 180px; height: auto; margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));
+        }
+        h1 { font-weight: 700; font-size: 2.2rem; margin: 10px 0; color: var(--gold); }
+        p.welcome { font-size: 1.1rem; color: #aaa; margin-bottom: 40px; }
+
+        /* شبكة النوافذ الـ 4 */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px; margin-top: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            padding: 30px 20px;
+            border-radius: 20px;
+            transition: 0.3s all ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            background: rgba(212, 175, 55, 0.05);
+            border-color: var(--gold);
+        }
+
+        .card h3 { font-size: 1rem; color: #ccc; margin-bottom: 15px; }
+        
+        /* النافذة الشغالة (رصيد الصندوق) */
+        .active-card .balance {
+            font-size: 2.2rem; font-weight: bold; color: var(--gold);
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        /* النوافذ قيد التطوير */
+        .pending-card { opacity: 0.7; }
+        .badge {
+            background: #444; color: #fff; font-size: 0.7rem;
+            padding: 4px 10px; border-radius: 10px; position: absolute; top: 10px; left: 10px;
+        }
+        .badge-active { background: var(--gold); color: black; font-weight: bold; }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* الهاتف */
+        @media (max-width: 600px) {
+            h1 { font-size: 1.6rem; }
+            .logo { width: 130px; }
+        }
+    </style>
 </head>
 <body>
-  <div class="card">
-    <div>رصيد الصندوق الحالي</div>
-    <div class="balance" id="val">--.--</div>
-    <div class="time" id="tm">جاري التحديث...</div>
-  </div>
-  <script>
-    const API = "https://script.google.com/macros/s/AKfycbyULn8ehV4cf4mjNaJtltCI24AqhxZ7NPZ-yGd1GQLj_eqESM2wuM5HzUR09-01yqqP/exec";
-    function update() {
-      fetch(API).then(res => res.json()).then(data => {
-        document.getElementById('val').innerText = Number(data.value).toLocaleString() + " $";
-        document.getElementById('tm').innerText = "آخر تحديث: " + data.time;
-      }).catch(e => document.getElementById('tm').innerText = "خطأ في الاتصال");
+
+<div class="container">
+    <div class="header-section">
+        <img src="https://i.ibb.co/3mS70qD/Argwan-Logo.png" alt="Argwan AlSham Logo" class="logo">
+        <h1>شركة أرجوان الشام</h1>
+        <p class="welcome">ترحب بكم في المنصة الإلكترونية الموحدة</p>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="card active-card" onclick="fetchBalance()">
+            <span class="badge badge-active">مباشر</span>
+            <h3>استعلام رصيد الصندوق</h3>
+            <div class="balance" id="balanceDisplay">--.-- $</div>
+            <div id="timeDisplay" style="font-size: 0.7rem; color: #666; margin-top: 10px;">جاري التحديث...</div>
+        </div>
+
+        <div class="card pending-card">
+            <span class="badge">قيد التطوير</span>
+            <h3>أرصدة الزبائن</h3>
+            <div style="font-size: 1.5rem; color: #444;">Coming Soon</div>
+        </div>
+
+        <div class="card pending-card">
+            <span class="badge">قيد التطوير</span>
+            <h3>أرصدة الموردين</h3>
+            <div style="font-size: 1.5rem; color: #444;">Coming Soon</div>
+        </div>
+
+        <div class="card pending-card">
+            <span class="badge">قيد التطوير</span>
+            <h3>كشف حساب تفصيلي</h3>
+            <div style="font-size: 1.5rem; color: #444;">Coming Soon</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // رابط جوجل سكريبت الخاص بك
+    const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbwLV4itQmvmgIxwLVf-340hCIwwLkq-yEkgBxSWvZBGbytSfc5TpTVUO7Lw8ANbhGAM/exec";
+
+    function fetchBalance() {
+        const balanceDisplay = document.getElementById('balanceDisplay');
+        const timeDisplay = document.getElementById('timeDisplay');
+        
+        fetch(GOOGLE_API_URL)
+            .then(response => response.json())
+            .then(data => {
+                let val = parseFloat(data.value);
+                let formatted = val.toLocaleString('en-US', { minimumFractionDigits: 2 });
+                balanceDisplay.innerText = formatted + ' $';
+                timeDisplay.innerText = "آخر مزامنة: " + new Date().toLocaleTimeString('ar-EG');
+            })
+            .catch(error => {
+                timeDisplay.innerText = "خطأ في الاتصال";
+            });
     }
-    update();
-    setInterval(update, 15000);
-  </script>
+
+    // تحديث كل 15 ثانية
+    fetchBalance();
+    setInterval(fetchBalance, 15000);
+</script>
+
 </body>
 </html>
