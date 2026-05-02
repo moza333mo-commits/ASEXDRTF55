@@ -1,106 +1,115 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>رصيد الصندوق</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
-        
-        body {
-            font-family: 'Cairo', sans-serif;
-            background-color: #f8f9fa;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
-        }
-        h1 {
-            color: #2c3e50;
-            margin-top: 0;
-            margin-bottom: 10px;
-            font-size: 2.2rem;
-        }
-        .balance-container {
-            margin: 30px 0;
-        }
-        #balance {
-            font-size: 3.5rem;
-            font-weight: 700;
-            color: #ff8c00; /* لون برتقالي */
-            direction: ltr;
-            display: inline-block;
-            transition: color 0.3s ease;
-        }
-        #status {
-            color: #6c757d;
-            font-size: 1.1rem;
-            min-height: 25px;
-            font-weight: bold;
-        }
-        .error-text {
-            color: #dc3545 !important;
-            font-size: 1.5rem !important;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم الاحترافية | الرصيد المباشر</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0f172a; /* لون ليلي داكن */
+      color: #ffffff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .card {
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+      padding: 40px;
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.1);
+      text-align: center;
+      width: 90%;
+      max-width: 420px;
+      border: 1px solid #334155;
+      position: relative;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: -2px; left: -2px; right: -2px; bottom: -2px;
+      background: linear-gradient(45deg, #10b981, transparent, #3b82f6);
+      border-radius: 26px;
+      z-index: -1;
+      opacity: 0.3;
+    }
+    .title {
+      font-size: 1.1rem;
+      color: #94a3b8;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+    .balance {
+      font-size: 4rem;
+      font-weight: 800;
+      color: #10b981; /* أخضر نيون */
+      text-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+      margin: 15px 0;
+      font-family: 'Courier New', Courier, monospace;
+    }
+    .time {
+      font-size: 0.85rem;
+      color: #64748b;
+      background: rgba(0,0,0,0.2);
+      padding: 8px 15px;
+      border-radius: 50px;
+      display: inline-block;
+    }
+    .loader {
+      color: #fbbf24;
+      font-weight: bold;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.4; }
+      50% { opacity: 1; }
+      100% { opacity: 0.4; }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>رصيد الصندوق</h1>
-        <div class="balance-container">
-            <div id="balance">---</div>
-        </div>
-        <div id="status">جاري التحميل...</div>
+
+  <div class="card">
+    <div class="title">رصيد الصندوق الحالي</div>
+    <div class="balance" id="balanceDisplay">--.--</div>
+    <div id="timeContainer">
+      <div class="time" id="timeDisplay">جاري الاتصال بالسحابة...</div>
     </div>
+  </div>
 
-    <script>
-        const balanceElement = document.getElementById('balance');
-        const statusElement = document.getElementById('status');
+  <script>
+    // تم تحديث الرابط هنا بناءً على طلبك
+    const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbwLV4itQmvmgIxwLVf-340hCIwwLkq-yEkgBxSWvZBGbytSfc5TpTVUO7Lw8ANbhGAM/exec";
 
-        async function fetchBalance() {
-            statusElement.textContent = "جاري التحديث...";
-            try {
-                // إضافة متغير وقت لمنع الكاش (Cache Busting)
-                const response = await fetch('/data?_t=' + new Date().getTime());
-                const data = await response.json();
+    function fetchBalance() {
+      const timeDisplay = document.getElementById('timeDisplay');
+      timeDisplay.innerHTML = '<span class="loader">🔄 جاري المزامنة...</span>';
+      
+      fetch(GOOGLE_API_URL)
+        .then(response => response.json())
+        .then(data => {
+          let val = parseFloat(data.value);
+          let formattedBalance = val.toLocaleString('en-US', { 
+            minimumFractionDigits: 2, 
+            maximumFractionDigits: 2 
+          });
+          
+          document.getElementById('balanceDisplay').innerText = formattedBalance + ' $';
+          document.getElementById('timeDisplay').innerText = 'آخر تحديث: ' + data.time;
+        })
+        .catch(error => {
+          document.getElementById('timeDisplay').innerText = 'خطأ في الاتصال بالسيرفر';
+          console.error('Error:', error);
+        });
+    }
 
-                if (data.error) {
-                    balanceElement.textContent = "خطأ";
-                    balanceElement.classList.add('error-text');
-                    statusElement.textContent = data.error;
-                } else {
-                    balanceElement.classList.remove('error-text');
-                    // تنسيق الرقم بفاصلات الآلاف
-                    balanceElement.textContent = Number(data.value).toLocaleString('en-US');
-                    statusElement.textContent = "مُحدث";
-                    
-                    // إخفاء كلمة محدث بعد ثانية ليكون التصميم أنظف
-                    setTimeout(() => {
-                        if(statusElement.textContent === "مُحدث") statusElement.textContent = "";
-                    }, 1000);
-                }
-            } catch (error) {
-                balanceElement.textContent = "---";
-                balanceElement.classList.add('error-text');
-                statusElement.textContent = "فشل الاتصال بالخادم";
-            }
-        }
-
-        // جلب البيانات فور فتح الصفحة
-        fetchBalance();
-        
-        // تحديث البيانات كل 3 ثواني بدون عمل Refresh
-        setInterval(fetchBalance, 3000);
-    </script>
+    fetchBalance();
+    setInterval(fetchBalance, 15000); // تحديث كل 15 ثانية
+  </script>
 </body>
 </html>
