@@ -2,114 +2,30 @@
 <html dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لوحة التحكم الاحترافية | الرصيد المباشر</title>
+  <title>لوحة التحكم | الرصيد المباشر</title>
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #0f172a; /* لون ليلي داكن */
-      color: #ffffff;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-    }
-    .card {
-      background: linear-gradient(145deg, #1e293b, #0f172a);
-      padding: 40px;
-      border-radius: 24px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.1);
-      text-align: center;
-      width: 90%;
-      max-width: 420px;
-      border: 1px solid #334155;
-      position: relative;
-    }
-    .card::before {
-      content: '';
-      position: absolute;
-      top: -2px; left: -2px; right: -2px; bottom: -2px;
-      background: linear-gradient(45deg, #10b981, transparent, #3b82f6);
-      border-radius: 26px;
-      z-index: -1;
-      opacity: 0.3;
-    }
-    .title {
-      font-size: 1.1rem;
-      color: #94a3b8;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-    }
-    .balance {
-      font-size: 4rem;
-      font-weight: 800;
-      color: #10b981; /* أخضر نيون */
-      text-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
-      margin: 15px 0;
-      font-family: 'Courier New', Courier, monospace;
-    }
-    .time {
-      font-size: 0.85rem;
-      color: #64748b;
-      background: rgba(0,0,0,0.2);
-      padding: 8px 15px;
-      border-radius: 50px;
-      display: inline-block;
-    }
-    .loader {
-      color: #fbbf24;
-      font-weight: bold;
-      animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-      0% { opacity: 0.4; }
-      50% { opacity: 1; }
-      100% { opacity: 0.4; }
-    }
+    body { margin: 0; background: #0f172a; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    .card { background: #1e293b; padding: 40px; border-radius: 20px; text-align: center; border: 1px solid #334155; width: 350px; }
+    .balance { font-size: 3.5rem; color: #10b981; margin: 20px 0; font-weight: bold; }
+    .time { color: #64748b; font-size: 0.9rem; }
   </style>
 </head>
 <body>
-
   <div class="card">
-    <div class="title">رصيد الصندوق الحالي</div>
-    <div class="balance" id="balanceDisplay">--.--</div>
-    <div id="timeContainer">
-      <div class="time" id="timeDisplay">جاري الاتصال بالسحابة...</div>
-    </div>
+    <div>رصيد الصندوق الحالي</div>
+    <div class="balance" id="val">--.--</div>
+    <div class="time" id="tm">جاري التحديث...</div>
   </div>
-
   <script>
-    // تم تحديث الرابط هنا بناءً على طلبك
-    const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbwLV4itQmvmgIxwLVf-340hCIwwLkq-yEkgBxSWvZBGbytSfc5TpTVUO7Lw8ANbhGAM/exec";
-
-    function fetchBalance() {
-      const timeDisplay = document.getElementById('timeDisplay');
-      timeDisplay.innerHTML = '<span class="loader">🔄 جاري المزامنة...</span>';
-      
-      fetch(GOOGLE_API_URL)
-        .then(response => response.json())
-        .then(data => {
-          let val = parseFloat(data.value);
-          let formattedBalance = val.toLocaleString('en-US', { 
-            minimumFractionDigits: 2, 
-            maximumFractionDigits: 2 
-          });
-          
-          document.getElementById('balanceDisplay').innerText = formattedBalance + ' $';
-          document.getElementById('timeDisplay').innerText = 'آخر تحديث: ' + data.time;
-        })
-        .catch(error => {
-          document.getElementById('timeDisplay').innerText = 'خطأ في الاتصال بالسيرفر';
-          console.error('Error:', error);
-        });
+    const API = "https://script.google.com/macros/s/AKfycbyULn8ehV4cf4mjNaJtltCI24AqhxZ7NPZ-yGd1GQLj_eqESM2wuM5HzUR09-01yqqP/exec";
+    function update() {
+      fetch(API).then(res => res.json()).then(data => {
+        document.getElementById('val').innerText = Number(data.value).toLocaleString() + " $";
+        document.getElementById('tm').innerText = "آخر تحديث: " + data.time;
+      }).catch(e => document.getElementById('tm').innerText = "خطأ في الاتصال");
     }
-
-    fetchBalance();
-    setInterval(fetchBalance, 15000); // تحديث كل 15 ثانية
+    update();
+    setInterval(update, 15000);
   </script>
 </body>
 </html>
