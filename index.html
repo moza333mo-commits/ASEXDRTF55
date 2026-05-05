@@ -7,138 +7,48 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --gold: #c7a064; /* لون ذهبي مستوحى من اللوغو */
+            --gold: #c7a064; 
             --dark-bg: #111111;
             --glass-bg: rgba(25, 25, 25, 0.7);
             --glass-border: rgba(199, 160, 100, 0.2);
             --text-main: #ffffff;
             --text-muted: #a0a0a0;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-        
-        body {
-            background-color: var(--dark-bg);
-            color: var(--text-main);
-            overflow-x: hidden;
-            background-image: radial-gradient(circle at 50% 0%, #2a2218 0%, #111111 70%);
-            min-height: 100vh;
-        }
-
-        /* --- شاشة الترحيب (Splash Screen) --- */
-        #splash-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--dark-bg);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.8s ease-out;
-        }
-        
-        /* تذكر: يجب رفع اللوغو الخاص بك بجانب هذا الملف وتسميته 1000070015.jpg */
-        .logo {
-            width: 150px;
-            height: 150px;
-            background: url('1000070015.jpg') no-repeat center center;
-            background-size: contain;
-            margin-bottom: 20px;
-            animation: pulse 2s infinite alternate;
-        }
-        
+        body { background-color: var(--dark-bg); color: var(--text-main); overflow-x: hidden; background-image: radial-gradient(circle at 50% 0%, #2a2218 0%, #111111 70%); min-height: 100vh; }
+        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--dark-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.8s ease-out; }
+        .logo { width: 150px; height: 150px; background: url('1000070015.jpg') no-repeat center center; background-size: contain; margin-bottom: 20px; animation: pulse 2s infinite alternate; }
         .splash-title { font-size: 28px; font-weight: 700; color: var(--gold); margin-bottom: 5px; }
         .splash-subtitle { font-size: 18px; font-weight: 300; letter-spacing: 2px; color: var(--text-muted); }
-
-        @keyframes pulse {
-            0% { transform: scale(0.95); opacity: 0.8; }
-            100% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 15px var(--gold)); }
-        }
-
-        /* --- الواجهة الرئيسية --- */
-        #main-dashboard {
-            display: none; 
-            padding: 40px 20px;
-            max-width: 1200px;
-            margin: auto;
-            animation: fadeIn 1s ease-in;
-        }
-
+        @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.8; } 100% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 15px var(--gold)); } }
+        #main-dashboard { display: none; padding: 40px 20px; max-width: 1200px; margin: auto; animation: fadeIn 1s ease-in; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
         header { text-align: center; margin-bottom: 40px; }
         h1 { color: var(--gold); font-weight: 900; font-size: 32px; }
         p.subtitle { color: var(--text-muted); font-size: 16px; }
-
-        /* قسم الإحصائيات العلوية */
-        .top-stats {
-            display: flex; justify-content: center; gap: 30px; margin-bottom: 50px;
-            flex-wrap: wrap;
-        }
-        .stat-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 30px;
-            width: 250px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transition: transform 0.3s, border-color 0.3s;
-        }
+        .top-stats { display: flex; justify-content: center; gap: 30px; margin-bottom: 50px; flex-wrap: wrap; }
+        .stat-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 30px; width: 250px; text-align: center; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: transform 0.3s, border-color 0.3s; }
         .stat-card:hover { transform: translateY(-5px); border-color: var(--gold); }
         .stat-card h3 { font-size: 18px; color: var(--text-muted); margin-bottom: 10px; }
         .stat-card .number { font-size: 50px; font-weight: 900; color: var(--gold); }
-
-        /* الأقسام الرئيسية */
-        .sections-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;
-        }
-        .section-btn {
-            background: linear-gradient(145deg, #1e1e1e, #111111);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px; padding: 40px 20px;
-            text-align: center; cursor: pointer;
-            transition: all 0.3s ease;
-        }
+        .sections-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .section-btn { background: linear-gradient(145deg, #1e1e1e, #111111); border: 1px solid var(--glass-border); border-radius: 20px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
         .section-btn:hover { background: #1a1a1a; box-shadow: 0 0 20px rgba(199, 160, 100, 0.2); border-color: var(--gold); }
         .section-btn h2 { color: var(--text-main); font-size: 24px; margin-bottom: 10px; }
         .section-btn p { color: var(--text-muted); font-size: 14px; }
-
-        /* --- النوافذ المنبثقة --- */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px);
-            z-index: 100; justify-content: center; align-items: center;
-            padding: 20px;
-        }
-        .modal-content {
-            background: var(--dark-bg);
-            border: 1px solid var(--gold);
-            border-radius: 20px; width: 100%; max-width: 900px;
-            max-height: 80vh; overflow-y: auto; padding: 30px;
-            position: relative; animation: slideIn 0.4s ease-out;
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); z-index: 100; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: var(--dark-bg); border: 1px solid var(--gold); border-radius: 20px; width: 100%; max-width: 1000px; max-height: 85vh; overflow-x: auto; overflow-y: auto; padding: 30px; position: relative; animation: slideIn 0.4s ease-out; }
         @keyframes slideIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        
-        .close-btn {
-            position: absolute; top: 20px; left: 20px;
-            background: none; border: none; color: var(--gold);
-            font-size: 30px; cursor: pointer; transition: 0.2s;
-        }
+        .close-btn { position: sticky; top: 0px; float: left; background: none; border: none; color: var(--gold); font-size: 30px; cursor: pointer; transition: 0.2s; z-index: 10; }
         .close-btn:hover { color: red; transform: scale(1.1); }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; white-space: nowrap; }
         th { background: rgba(199, 160, 100, 0.1); color: var(--gold); padding: 15px; text-align: right; border-bottom: 2px solid var(--gold); }
         td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-main); }
         tr:hover { background: rgba(255,255,255,0.02); }
-
         #loading-indicator { text-align: center; color: var(--gold); font-size: 14px; margin-top: 20px; }
     </style>
 </head>
 <body>
-
     <div id="splash-screen">
         <div class="logo"></div>
         <div class="splash-title">منصة أرجوان الشام الموحدة</div>
@@ -180,13 +90,7 @@
             <button class="close-btn" onclick="closeModal('modal-daily')">&times;</button>
             <h2 style="color: var(--gold); margin-bottom: 20px;">التحليل اليومي للكوادر</h2>
             <table id="daily-table">
-                <thead>
-                    <tr>
-                        <th>اليوم / التاريخ</th>
-                        <th>عدد الشباب</th>
-                        <th>عدد البنات</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>اليوم / التاريخ</th><th>عدد الشباب</th><th>عدد البنات</th></tr></thead>
                 <tbody></tbody>
             </table>
         </div>
@@ -197,16 +101,13 @@
             <button class="close-btn" onclick="closeModal('modal-missing')">&times;</button>
             <h2 style="color: var(--gold); margin-bottom: 20px;">سجل نقص البصمات</h2>
             <table id="missing-table">
-                <thead>
-                    <tr id="missing-headers"></tr>
-                </thead>
+                <thead><tr id="missing-headers"></tr></thead>
                 <tbody></tbody>
             </table>
         </div>
     </div>
 
     <script>
-        // تم دمج الرابط الخاص بك هنا بعد تحويله لصيغة تصدير البيانات (CSV)
         const csvUrl = 'https://docs.google.com/spreadsheets/d/1U3Vkh50LYWZod0DbdFeANy51pOjU5lw7/export?format=csv&gid=196803144';
 
         setTimeout(() => {
@@ -222,70 +123,88 @@
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         window.onclick = function(event) { if (event.target.classList.contains('modal')) event.target.style.display = 'none'; }
 
-        function parseCSV(text) {
-            let rows = []; let row = []; let inQuotes = false; let val = '';
-            for (let i = 0; i < text.length; i++) {
-                let char = text[i];
-                if (char === '"') inQuotes = !inQuotes;
-                else if (char === ',' && !inQuotes) { row.push(val); val = ''; }
-                else if (char === '\n' && !inQuotes) { row.push(val); rows.push(row); row = []; val = ''; }
-                else val += char;
+        // قارئ بيانات (Parser) جديد ومحصن 100% 
+        function parseRobustCSV(str) {
+            let arr = []; let quote = false;
+            for (let row = 0, col = 0, c = 0; c < str.length; c++) {
+                let cc = str[c], nc = str[c+1];
+                arr[row] = arr[row] || [];
+                arr[row][col] = arr[row][col] || '';
+                if (cc === '"' && quote && nc === '"') { arr[row][col] += cc; ++c; continue; }
+                if (cc === '"') { quote = !quote; continue; }
+                if (cc === ',' && !quote) { ++col; continue; }
+                if (cc === '\r' && nc === '\n' && !quote) { ++row; col = 0; ++c; continue; }
+                if (cc === '\n' && !quote) { ++row; col = 0; continue; }
+                if (cc === '\r' && !quote) { ++row; col = 0; continue; }
+                arr[row][col] += cc;
             }
-            row.push(val); rows.push(row);
-            return rows;
+            return arr;
+        }
+
+        // دالة مساعدة لاستخراج الخلية حتى لو كانت فارغة لتجنب الأخطاء
+        function getCell(rows, r, c) {
+            if (rows && rows[r] && rows[r][c] !== undefined) {
+                return rows[r][c].trim();
+            }
+            return '';
         }
 
         async function fetchData() {
             try {
                 const response = await fetch(csvUrl);
                 const text = await response.text();
-                const rows = parseCSV(text);
+                const rows = parseRobustCSV(text);
 
-                // إجمالي الشباب والبنات
-                if(rows.length > 10) {
-                    document.getElementById('total-male').innerText = rows[10][16] || '0';
-                    document.getElementById('total-female').innerText = rows[10][17] || '0';
-                }
+                // --- 1. الإحصائيات العلوية ---
+                // الصف 11 في الإكسل هو (Index 10). الشباب في R (Index 17)، والبنات في Q (Index 16).
+                let femaleTotal = getCell(rows, 10, 16); // خلية Q11
+                let maleTotal = getCell(rows, 10, 17);   // خلية R11
+                
+                document.getElementById('total-female').innerText = femaleTotal !== '' ? femaleTotal : '0';
+                document.getElementById('total-male').innerText = maleTotal !== '' ? maleTotal : '0';
 
-                // إحصائيات الحضور (P1 إلى R11)
+                // --- 2. إحصائيات الحضور اليومية ---
+                // من الصف 2 إلى الصف 10 (أي Index 1 إلى 9) 
                 const dailyTableBody = document.querySelector('#daily-table tbody');
                 dailyTableBody.innerHTML = ''; 
-                for(let i = 1; i <= 10; i++) {
-                    if(!rows[i]) continue;
-                    let dayDate = rows[i][15]; // P
-                    let maleCount = rows[i][16]; // Q
-                    let femaleCount = rows[i][17]; // R
+                for(let i = 1; i <= 9; i++) {
+                    let dayDate = getCell(rows, i, 15);     // P
+                    let femaleCount = getCell(rows, i, 16); // Q
+                    let maleCount = getCell(rows, i, 17);   // R
                     
-                    if(dayDate && dayDate.trim() !== '') {
+                    if(dayDate !== '') {
                         let tr = document.createElement('tr');
                         tr.innerHTML = `<td>${dayDate}</td><td>${maleCount || 0}</td><td>${femaleCount || 0}</td>`;
                         dailyTableBody.appendChild(tr);
                     }
                 }
 
-                // سجل البصمات الناقصة (T1 إلى AA200)
+                // --- 3. سجل نقص البصمات ---
+                // من عمود T (Index 19) إلى AA (Index 26)
                 const missingHeaders = document.getElementById('missing-headers');
                 const missingBody = document.querySelector('#missing-table tbody');
                 missingHeaders.innerHTML = '';
                 missingBody.innerHTML = '';
 
-                if(rows[0]) {
-                    for(let col = 19; col <= 26; col++) {
-                        let th = document.createElement('th');
-                        th.innerText = rows[0][col] || 'عنوان';
-                        missingHeaders.appendChild(th);
-                    }
+                // جلب العناوين (الصف الأول Index 0)
+                for(let col = 19; col <= 26; col++) {
+                    let th = document.createElement('th');
+                    let headerText = getCell(rows, 0, col);
+                    th.innerText = headerText !== '' ? headerText : '-';
+                    missingHeaders.appendChild(th);
                 }
 
+                // جلب البيانات لباقي الصفوف
                 for(let i = 1; i < Math.min(rows.length, 200); i++) {
                     let hasData = false;
                     let tr = document.createElement('tr');
                     for(let col = 19; col <= 26; col++) {
                         let td = document.createElement('td');
-                        let cellData = rows[i][col] || '';
+                        let cellData = getCell(rows, i, col);
                         td.innerText = cellData;
                         tr.appendChild(td);
-                        if(cellData.trim() !== '') hasData = true;
+                        // إذا كان في الخلية أي شيء غير فارغ، نعرض الصف بالكامل
+                        if(cellData !== '') hasData = true;
                     }
                     if(hasData) missingBody.appendChild(tr);
                 }
