@@ -115,9 +115,10 @@
     </div>
 
     <script>
-        // الرابط الجديد والصحيح مدمج هنا
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQwil5nC5jhWOJ_sQjoXdwZD-KA_sO3r3pCBBmHn6Qjzn87nzCQhfPQF8HFS6m2X3hTagAs8onhDunA/pub?gid=1642114548&single=true&output=csv';
+        // التعديل: القراءة من الملف المحلي الذي ينتجه البايثون
+        const dataUrl = 'attendance_data.json';
 
+        // إخفاء شاشة البداية
         setTimeout(() => {
             document.getElementById('splash-screen').style.opacity = '0';
             setTimeout(() => {
@@ -129,98 +130,63 @@
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        window.onclick = function(event) { if (event.target.classList.contains('modal')) event.target.style.display = 'none'; }
-
-        function parseRobustCSV(str) {
-            let arr = []; let quote = false;
-            for (let row = 0, col = 0, c = 0; c < str.length; c++) {
-                let cc = str[c], nc = str[c+1];
-                arr[row] = arr[row] || [];
-                arr[row][col] = arr[row][col] || '';
-                if (cc === '"' && quote && nc === '"') { arr[row][col] += cc; ++c; continue; }
-                if (cc === '"') { quote = !quote; continue; }
-                if (cc === ',' && !quote) { ++col; continue; }
-                if (cc === '\r' && nc === '\n' && !quote) { ++row; col = 0; ++c; continue; }
-                if (cc === '\n' && !quote) { ++row; col = 0; continue; }
-                if (cc === '\r' && !quote) { ++row; col = 0; continue; }
-                arr[row][col] += cc;
-            }
-            return arr;
-        }
-
-        function getCell(rows, r, c) {
-            if (rows && rows[r] && rows[r][c] !== undefined) {
-                return rows[r][c].trim();
-            }
-            return '';
-        }
-
+        
         async function fetchData() {
             try {
-                // إضافة متغير عشوائي للرابط لمنع الكاش (عشان يجيب البيانات جديدة دايماً)
-                const cacheBuster = `&t=${new Date().getTime()}`;
-                const response = await fetch(csvUrl + cacheBuster);
-                const text = await response.text();
-                const rows = parseRobustCSV(text);
+                // القراءة من ملف JSON
+                const response = await fetch(dataUrl + '?t=' + new Date().getTime());
+                const data = await response.json();
 
-                // --- 1. الإحصائيات العلوية ---
-                let femaleTotal = getCell(rows, 10, 16); // خلية Q11
-                let maleTotal = getCell(rows, 10, 17);   // خلية R11
-                
-                document.getElementById('total-female').innerText = femaleTotal !== '' ? femaleTotal : '0';
-                document.getElementById('total-male').innerText = maleTotal !== '' ? maleTotal : '0';
+                // 1. تحديث إجمالي الشباب والبنات (المتواجدون الآن)
+                document.getElementById('total-female').innerText = data.total_female;
+                document.getElementById('total-male').innerText = data.total_male;
 
-                // --- 2. إحصائيات الحضور اليومية ---
+                // 2. تحديث جدول الإحصائيات اليومية
                 const dailyTableBody = document.querySelector('#daily-table tbody');
                 dailyTableBody.innerHTML = ''; 
-                for(let i = 1; i <= 9; i++) {
-                    let dayDate = getCell(rows, i, 15);     // P
-                    let femaleCount = getCell(rows, i, 16); // Q
-                    let maleCount = getCell(rows, i, 17);   // R
-                    
-                    if(dayDate !== '') {
-                        let tr = document.createElement('tr');
-                        tr.innerHTML = `<td>${dayDate}</td><td>${maleCount || 0}</td><td>${femaleCount || 0}</td>`;
-                        dailyTableBody.appendChild(tr);
-                    }
-                }
+                data.daily_stats.forEach(stat => {
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${stat.date}</td><td>${stat.male}</td><td>${stat.female}</td>`;
+                    dailyTableBody.appendChild(tr);
+                });
 
-                // --- 3. سجل نقص البصمات ---
+                // 3. تحديث سجل نقص البصمات
                 const missingHeaders = document.getElementById('missing-headers');
                 const missingBody = document.querySelector('#missing-table tbody');
                 missingHeaders.innerHTML = '';
                 missingBody.innerHTML = '';
 
-                for(let col = 19; col <= 26; col++) {
+                // كتابة العناوين (التواريخ)
+                data.missing_punches_headers.forEach(h => {
                     let th = document.createElement('th');
-                    let headerText = getCell(rows, 0, col);
-                    th.innerText = headerText !== '' ? headerText : '-';
+                    th.innerText = h;
                     missingHeaders.appendChild(th);
+                });
+
+                // كتابة الأسماء
+                // ملاحظة: بايثون سيرسل الأسماء كمصفوفة مصفوفات
+                if (data.missing_punches_rows) {
+                    data.missing_punches_rows.forEach(row => {
+                        let tr = document.createElement('tr');
+                        row.forEach(name => {
+                            let td = document.createElement('td');
+                            td.innerText = name || '';
+                            tr.appendChild(td);
+                        });
+                        missingBody.appendChild(tr);
+                    });
                 }
 
-                for(let i = 1; i < Math.min(rows.length, 200); i++) {
-                    let hasData = false;
-                    let tr = document.createElement('tr');
-                    for(let col = 19; col <= 26; col++) {
-                        let td = document.createElement('td');
-                        let cellData = getCell(rows, i, col);
-                        td.innerText = cellData;
-                        tr.appendChild(td);
-                        if(cellData !== '') hasData = true;
-                    }
-                    if(hasData) missingBody.appendChild(tr);
-                }
-
-                document.getElementById('loading-indicator').innerText = 'تم تحديث البيانات بنجاح ✔';
-                document.getElementById('loading-indicator').style.color = '#2ecc71';
+                document.getElementById('loading-indicator').innerText = 'آخر تحديث حقيقي: ' + data.last_update + ' ✔';
+                document.getElementById('loading-indicator').style.color = '#c7a064';
 
             } catch (error) {
-                console.error("خطأ:", error);
-                document.getElementById('loading-indicator').innerText = 'تعذر جلب البيانات! يرجى المحاولة لاحقاً.';
-                document.getElementById('loading-indicator').style.color = 'red';
+                console.error("خطأ في جلب البيانات:", error);
+                document.getElementById('loading-indicator').innerText = 'بانتظار مزامنة البايثون...';
             }
         }
 
+        // تحديث كل دقيقة
         setInterval(fetchData, 60000);
     </script>
 </body>
